@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# NOTE: the runtime artifacts (real_flood_dataset.parquet, model_outputs_real/,
+# data_cache/official_flood_polygons.geojson) are INTENTIONALLY committed here so
+# the app runs and deploys without re-fetching data. They are tracked, not ignored.

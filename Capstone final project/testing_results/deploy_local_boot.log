@@ -1,0 +1,9 @@
+
+  You can now view your Streamlit app in your browser.
+
+  URL: http://127.0.0.1:8599
+
+
+[deploy verification] Wed Jun 24 17:18:28 SAST 2026
+GET /_stcore/health -> HTTP 200
+GET /               -> HTTP 200
