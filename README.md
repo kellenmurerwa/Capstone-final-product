@@ -67,6 +67,24 @@ API responses are cached in `data_cache/`, so re-runs are fast and offline-frien
 | `model_outputs_real/` | Trained models, figures, `results_summary.json` |
 | `Flood_Risk_HMM_Capstone_Proposal.docx/.pdf` | The written proposal |
 
+## Data sources
+
+All inputs are real and free; only OpenStreetMap requires a `User-Agent` header.
+Endpoints below are the ones actually called in `build_real_dataset.py` and
+`add_official_polygons.py` (verified live).
+
+| # | Feature(s) it provides | Source | API / endpoint | Access · licence |
+|---|---|---|---|---|
+| 1 | `rainfall_1d/3d/7d/14d_mm` (daily totals → accumulation features) | Open-Meteo — ERA5 reanalysis | `https://archive-api.open-meteo.com/v1/archive` | Free, keyless · ERA5/Copernicus |
+| 2 | `elevation_m`, derived `slope_deg` (terrain) | Open-Meteo — SRTM elevation | `https://api.open-meteo.com/v1/elevation` | Free, keyless · SRTM/NASA |
+| 3 | `distance_to_river_m`, `road_density_km_per_km2`, `building_density_count_per_km2` (rivers, roads, buildings) | OpenStreetMap — Overpass API | `https://overpass.kumi.systems/api/interpreter` (any Overpass mirror works; mirrors rate-limit and need a `User-Agent`) | Free · ODbL |
+| 4 | `flood_polygon_intersection` (+ spatial-validation reference) | Rwanda GeoPortal — Ministry of Environment | `https://geodata.rw/server/rest/services/basemap/Flood_Risk_Areas/FeatureServer/0` (query params must be URL-encoded) | Free · MOE |
+
+> **Note on rainfall:** the proposal named Meteo Rwanda / CHIRPS; the implementation
+> uses **Open-Meteo ERA5 reanalysis** because Meteo Rwanda offered no open, keyless
+> access within the project window. ERA5 is real but reanalysis-grade (~9–31 km),
+> so validation against Meteo Rwanda gauge records is future work.
+
 ## Data & ethics note
 
 A *flood-pressure state* is a **derived risk condition** (rainfall + terrain + exposure),
