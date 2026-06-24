@@ -261,13 +261,20 @@ def main():
         "spatial_agreement>=0.70": any(res[m]["spatial_agreement_high_in_zone"] >= 0.70
                                        for m in ["RandomForest", "XGBoost"]),
     }
+    # The flood_polygon feature is upgraded from the terrain-hydrology proxy to
+    # the official MOE polygons once add_official_polygons.py has run (its cached
+    # GeoJSON is then present). Label the source accordingly so the metadata
+    # matches the data actually in the parquet.
+    poly_src = ("Rwanda GeoPortal / MOE official flood-risk polygons (real)"
+                if (ROOT / "data_cache" / "official_flood_polygons.geojson").exists()
+                else "terrain-hydrology susceptibility proxy")
     summary = {"dataset": {"rows": len(df), "cells": int(df["grid_id"].nunique()),
                            "days": int(df["date"].nunique()),
                            "period": "2018-2024", "test_period": "2024"},
                "data_sources": {"rainfall": "Open-Meteo ERA5 (real)",
                                 "elevation": "Open-Meteo/SRTM (real)",
                                 "rivers_roads_buildings": "OpenStreetMap Overpass (real)",
-                                "flood_polygon": "terrain-hydrology susceptibility proxy"},
+                                "flood_polygon": poly_src},
                "supervised_results": res, "hmm": hmm_res, "targets_met": tgt}
     (OUT / "results_summary.json").write_text(json.dumps(summary, indent=2, default=str))
 

@@ -10,7 +10,7 @@
     "rainfall": "Open-Meteo ERA5 (real)",
     "elevation": "Open-Meteo/SRTM (real)",
     "rivers_roads_buildings": "OpenStreetMap Overpass (real)",
-    "flood_polygon": "terrain-hydrology susceptibility proxy"
+    "flood_polygon": "Rwanda GeoPortal / MOE official flood-risk polygons (real)"
   },
   "supervised_results": {
     "LogisticRegression": {
