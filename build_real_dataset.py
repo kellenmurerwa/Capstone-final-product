@@ -41,7 +41,18 @@ LAT0 = (LAT_MIN + LAT_MAX) / 2
 
 M_PER_DEG_LAT = 111_320.0
 M_PER_DEG_LON = 111_320.0 * np.cos(np.radians(LAT0))
-OVERPASS = "https://overpass.kumi.systems/api/interpreter"
+# Public Overpass mirrors are interchangeable but rate-limit (HTTP 429) any
+# request without a User-Agent and go down individually, so we rotate through a
+# few and always send a UA.
+OVERPASS_MIRRORS = [
+    "https://overpass.kumi.systems/api/interpreter",
+    "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
+    "https://overpass.private.coffee/api/interpreter",
+    "https://overpass-api.de/api/interpreter",
+]
+OVERPASS_HEADERS = {
+    "User-Agent": "flood-risk-hmm-rwanda/1.0 (ALU capstone; contact: neotixai@gmail.com)"
+}
 
 
 def to_m(lat, lon):
@@ -123,15 +134,27 @@ def overpass(query, name):
     cache = CACHE / f"osm_{name}.json"
     if cache.exists():
         return json.loads(cache.read_text())
-    for attempt in range(3):
-        try:
-            r = requests.post(OVERPASS, data={"data": query}, timeout=180)
-            j = r.json()
-            cache.write_text(json.dumps(j))
-            return j
-        except Exception as e:
-            print(f"[osm:{name}] retry {attempt+1}: {str(e)[:60]}")
-            time.sleep(5)
+    # try each mirror; on rate-limit/timeout fall through to the next one
+    for attempt in range(2):
+        for url in OVERPASS_MIRRORS:
+            try:
+                r = requests.post(url, data={"data": query},
+                                  headers=OVERPASS_HEADERS, timeout=180)
+                if r.status_code != 200:
+                    print(f"[osm:{name}] {url.split('/')[2]} -> HTTP "
+                          f"{r.status_code}, trying next mirror")
+                    continue
+                j = r.json()                       # raises if not valid JSON
+                if "elements" not in j:
+                    print(f"[osm:{name}] {url.split('/')[2]} -> no 'elements', "
+                          f"trying next mirror")
+                    continue
+                cache.write_text(json.dumps(j))
+                return j
+            except Exception as e:
+                print(f"[osm:{name}] {url.split('/')[2]} retry: {str(e)[:50]}")
+        time.sleep(5)
+    print(f"[osm:{name}] all Overpass mirrors failed; returning empty set")
     return {"elements": []}
 
 
