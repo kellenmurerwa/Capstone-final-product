@@ -14,3 +14,8 @@ Thumbs.db
 # NOTE: the runtime artifacts (real_flood_dataset.parquet, model_outputs_real/,
 # data_cache/official_flood_polygons.geojson) are INTENTIONALLY committed here so
 # the app runs and deploys without re-fetching data. They are tracked, not ignored.
+
+# Raw API cache (rainfall/elevation/OSM json) — regenerated on build; the app
+# runs from the committed parquet, so these caches are not needed in the repo.
+# (official_flood_polygons.geojson stays tracked — it is a .geojson, not matched.)
+data_cache/*.json
