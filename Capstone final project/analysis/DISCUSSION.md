@@ -42,7 +42,7 @@ exists."
 The HMM and the polygon validation milestone forced the project to confront two
 hard questions: *does flood pressure have learnable day-to-day structure?* (yes —
 strong persistence) and *does the model agree with the authoritative map?*
-(yes — 1.84× enrichment inside official zones). This is the milestone that makes
+(yes — 1.85× inside/outside odds inside official zones). This is the milestone that makes
 the output **trustworthy to a disaster manager**, because it ties model output to
 the reference they already use.
 
@@ -86,9 +86,9 @@ interactively or pushed as a daily summary at near-zero marginal cost.
   (rainfall trigger × terrain susceptibility + a drainage latent and noise), not
   confirmed flood events. Care was taken to keep the labelling non-circular, but
   the absence of a ground-truth incident register is the project's main limitation.
-- **Single corridor / single test year.** Results are validated on one catchment
-  and one hold-out year (2024). Generalisation to other Kigali catchments or years
-  is plausible but unproven.
+- **Single corridor / single test year.** Results use one catchment with a
+  chronological split — a 2023 validation year and an untouched 2024 test year.
+  Generalisation to other Kigali catchments or further years is plausible but unproven.
 - **Model sharpness.** The decision boundary saturates fast (P(High)→1 under
   modest sustained rain), which boosts recall but compresses the Moderate band and
   may over-warn in borderline conditions.

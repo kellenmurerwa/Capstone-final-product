@@ -47,8 +47,8 @@ test_spatial_enrichment_above_one ........................ PASSED
 ```
 
 Full log: [`test_output_pytest.txt`](test_output_pytest.txt). The integration test
-independently re-computes macro-F1 = 0.813 and high-recall = 0.847 on the 2024
-hold-out, confirming the published `results_summary.json` is reproducible.
+independently re-computes macro-F1 = 0.813 and high-recall = 0.843 on the 2024
+test hold-out, confirming the published `results_summary.json` is reproducible.
 
 ---
 

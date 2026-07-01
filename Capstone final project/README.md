@@ -80,7 +80,7 @@ python "Capstone final project/tests/make_dashboard_preview.py"
 | `main.py` | Pipeline orchestrator / CLI entry point |
 | `build_real_dataset.py` | Fetch real data, engineer features, build labels → `real_flood_dataset.parquet` |
 | `add_official_polygons.py` | Official MOE flood-polygon integration |
-| `train_real.py` | Train baselines + RF + XGBoost + HMM; 2024 temporal hold-out; SHAP |
+| `train_real.py` | Train baselines + RF + XGBoost + HMM; train/val/test temporal split; SHAP |
 | `evaluate_spatial.py` | Spatial validation (enrichment, odds ratio) + risk map |
 | `dashboard.py` | **The deployed Streamlit app** |
 | `model_outputs_real/` | Trained models, figures, `results_summary.json` |
@@ -116,17 +116,21 @@ python "Capstone final project/tests/make_dashboard_preview.py"
 
 ---
 
-## ✅ Results at a glance (2024 temporal hold-out)
+## ✅ Results at a glance (2024 test hold-out)
+
+Temporal split: **train 2018–2022 · validation 2023 · test 2024**.
 
 | Model | Macro-F1 | High-recall | Note |
 |---|---|---|---|
-| **Random Forest** | **0.831** | **0.867** | best — meets F1≥0.75 & recall≥0.80 |
-| XGBoost (+SHAP) | 0.813 | 0.847 | deployed model |
-| Rainfall-threshold baseline | 0.623 | — | beaten by +0.21 F1 |
-| Static-polygon baseline | 0.324 | — | beaten by +0.51 F1 |
+| **XGBoost (+SHAP)** | **0.813** | 0.843 | best & deployed — meets F1≥0.75 & recall≥0.80 |
+| Random Forest | 0.813 | **0.849** | ties on F1, best High-recall |
+| Rainfall-threshold baseline | 0.626 | — | beaten by +0.19 F1 |
+| Static-polygon baseline | 0.324 | — | beaten by +0.49 F1 |
 
-Spatial validation vs official polygons: **enrichment 1.59×** (target ≥1.4 ✅),
-inside/outside High odds **1.84×** (target ≥1.5 ✅). Live query latency **p95 ≈
+Train/validation/test macro-F1 track closely (XGBoost 0.804 / 0.805 / 0.813;
+RF 0.813 / 0.806 / 0.813) — no over-fitting; the model generalises across years.
+Spatial validation vs official polygons: **enrichment 1.60×** (target ≥1.4 ✅),
+inside/outside High odds **1.85×** (target ≥1.5 ✅). Live query latency **p95 ≈
 9.6 ms** vs the 2 s budget ✅. Full breakdown in
 [`analysis/ANALYSIS.md`](analysis/ANALYSIS.md).
 

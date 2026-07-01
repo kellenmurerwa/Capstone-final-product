@@ -100,8 +100,8 @@ def test_2024_holdout_reproduces_headline_metrics(data, model):
     pred = m.predict(te[feat].values)
     macro_f1 = f1_score(y, pred, average="macro")
     high_recall = recall_score(y, pred, labels=[2], average="macro")
-    assert macro_f1 == pytest.approx(0.8125, abs=0.02)     # SMART target >= 0.75
-    assert high_recall == pytest.approx(0.8466, abs=0.02)  # SMART target >= 0.80
+    assert macro_f1 == pytest.approx(0.8127, abs=0.02)     # SMART target >= 0.75
+    assert high_recall == pytest.approx(0.8435, abs=0.02)  # SMART target >= 0.80
     assert macro_f1 >= 0.75
     assert high_recall >= 0.80
 

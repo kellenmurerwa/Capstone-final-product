@@ -19,7 +19,7 @@ on how the product should and should not be applied, and (B) future technical wo
 
 2. **Trust the spatial pattern more than the exact class.** The model reliably
    concentrates High pressure inside and immediately around the official flood
-   zones (1.84× odds) and highlights a wider rainfall-driven footprint. Treat the
+   zones (1.85× odds) and highlights a wider rainfall-driven footprint. Treat the
    *map of where pressure is rising* as the primary output; treat the exact
    Low/Moderate/High label of a single borderline cell with caution, given the
    sharp decision boundary.

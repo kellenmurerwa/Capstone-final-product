@@ -23,20 +23,23 @@ polygons.
    an unobserved drainage latent + noise so the task is not trivially circular).
 4. Trains and benchmarks: rainfall-threshold & static-polygon baselines, Logistic
    Regression, Decision Tree, **Random Forest**, **XGBoost** (+ SHAP), and an
-   **HMM** temporal layer — evaluated on a **temporal hold-out** (train 2018–23, test 2024).
+   **HMM** temporal layer — evaluated on a **temporal train/validation/test split**
+   (train 2018–2022, validation 2023, test 2024).
 5. Validates spatially against the official polygons and ships a **Streamlit dashboard**.
 
-## Headline results (2024 hold-out)
+## Headline results (2024 test hold-out)
 
 | Model | Macro-F1 | High-recall |
 |---|---|---|
-| Random Forest | **0.831** | 0.867 |
-| XGBoost | 0.813 | 0.847 |
-| Rainfall-threshold baseline | 0.623 | — |
+| XGBoost (deployed) | **0.813** | 0.843 |
+| Random Forest | 0.813 | 0.849 |
+| Rainfall-threshold baseline | 0.626 | — |
 | Static-polygon baseline | 0.324 | — |
 
-Spatial validation vs official polygons: containment 0.30, **enrichment 1.59×**,
-inside/outside High odds **1.84×** (model concentrates High-pressure in official
+Train/validation/test macro-F1 are near-identical for both ensembles (XGBoost
+0.804 / 0.805 / 0.813; RF 0.813 / 0.806 / 0.813) — no over-fitting. Spatial
+validation vs official polygons: containment 0.30, **enrichment 1.60×**,
+inside/outside High odds **1.85×** (model concentrates High-pressure in official
 flood zones while capturing a broader rainfall-driven footprint).
 
 ---

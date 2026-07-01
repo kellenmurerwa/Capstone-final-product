@@ -9,10 +9,12 @@ Real, free, keyless data sources actually used:
   * Elevation (SRTM)                      -> Open-Meteo elevation API (SRTM/GLO).
   * Slope                                 -> computed from the elevation grid.
   * Rivers / roads / buildings (OSM)      -> OpenStreetMap Overpass API.
-  * Flood-risk polygon                    -> terrain+hydrology susceptibility
-    proxy (official Rwanda GeoPortal polygons need a manual GeoPortal download
-    with no open API; the proxy is clearly flagged and used for the
-    flood_polygon_intersection feature and spatial-agreement validation).
+  * Flood-risk polygon                    -> OFFICIAL Rwanda GeoPortal flood
+    layer fetched live from the geodata.rw REST endpoint (source: Ministry of
+    Environment); cell centroids are tested against the real polygons for the
+    flood_polygon_intersection feature and spatial-agreement validation. A
+    terrain+hydrology susceptibility proxy is used only as a fallback if the
+    official layer does not cover the AOI (flagged via flood_polygon_source).
 
 Output: real_flood_dataset.parquet (+ .csv sample) -- one row per grid-cell-day
 with the same schema as the original modelling table, but real values.
