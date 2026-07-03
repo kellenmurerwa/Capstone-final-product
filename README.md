@@ -1,101 +1,127 @@
-# Geospatial Flood-Risk Modelling using Climate Data and Hidden Markov Models in Rwanda
+# Capstone — Final Version of the Product/Solution
 
-**Capstone project — BSc Software Engineering, African Leadership University**
-Author: Kellen Murerwa · Supervisor: Emmanuel Adjei
+### Geospatial Flood-Risk Modelling using Climate Data and Hidden Markov Models in Rwanda
+**Nyabugogo–Nyabarongo / Mpazi corridor, Kigali** · BSc Software Engineering, African Leadership University
+**Author:** Kellen Murerwa  ·  **Supervisor:** Emmanuel Adjei
 
-A reproducible machine-learning + Hidden Markov Model framework that estimates
-**daily Low / Moderate / High flood-pressure states** for the **Nyabugogo–Nyabarongo
-corridor in Kigali, Rwanda**, by fusing real rainfall, terrain, hydrology and
-urban-exposure data, and validates the result against the official flood-risk
-polygons.
+A reproducible machine-learning + Hidden Markov Model system that estimates daily
+**Low / Moderate / High flood-pressure states** over a 729-cell, 250 m grid by
+fusing real rainfall, terrain, hydrology and urban-exposure data, validates the
+result against the official Ministry-of-Environment flood polygons, and serves it
+through an interactive Streamlit dashboard.
+
+> A *flood-pressure state* is a **derived risk condition** (rainfall + terrain +
+> exposure), **not** a confirmed flood event. This is a decision-support /
+> screening tool that complements — not replaces — official early-warning systems.
 
 ---
 
-## What it does
+## 📦 What this submission folder contains
 
-1. Builds a **250 m grid** over the study corridor (729 cells).
-2. Pulls **real, free, keyless data** per cell-day, 2018–2024:
-   - **Rainfall** (1/3/7/14-day totals) — Open-Meteo **ERA5** archive
-   - **Elevation + slope** — Open-Meteo **SRTM** elevation
-   - **Distance-to-river, road & building density** — **OpenStreetMap** (Overpass)
-   - **Official flood-risk polygons** — Rwanda GeoPortal / **geodata.rw** (Ministry of Environment)
-3. Derives **flood-pressure labels** (rainfall trigger × terrain susceptibility, with
-   an unobserved drainage latent + noise so the task is not trivially circular).
-4. Trains and benchmarks: rainfall-threshold & static-polygon baselines, Logistic
-   Regression, Decision Tree, **Random Forest**, **XGBoost** (+ SHAP), and an
-   **HMM** temporal layer — evaluated on a **temporal train/validation/test split**
-   (train 2018–2022, validation 2023, test 2024).
-5. Validates spatially against the official polygons and ships a **Streamlit dashboard**.
-
-## Headline results (2024 test hold-out)
-
-| Model | Macro-F1 | High-recall |
+| Path | Purpose | Rubric criterion |
 |---|---|---|
-| XGBoost (deployed) | **0.813** | 0.843 |
-| Random Forest | 0.813 | 0.849 |
-| Rainfall-threshold baseline | 0.626 | — |
-| Static-polygon baseline | 0.324 | — |
+| [`testing_results/TESTING_RESULTS.md`](testing_results/TESTING_RESULTS.md) | All test runs + demo screenshots | **Testing Results (5 pts)** |
+| [`testing_results/screenshots/`](testing_results/screenshots/) | Demo & model figures (PNG) | Testing Results |
+| [`testing_results/*.txt`](testing_results/) | Raw captured test output | Testing Results |
+| [`analysis/ANALYSIS.md`](analysis/ANALYSIS.md) | Results vs. proposal objectives | **Analysis (2 pts)** |
+| [`analysis/DISCUSSION.md`](analysis/DISCUSSION.md) | Milestone importance + impact | Discussion |
+| [`analysis/RECOMMENDATIONS.md`](analysis/RECOMMENDATIONS.md) | Community guidance + future work | Recommendations |
+| [`deployment/`](deployment/) | Dockerfile, Streamlit/Render config, deploy guide | **Deployment (3 pts)** |
+| [`tests/`](tests/) | The test scripts (re-runnable) | Testing Results |
 
-Train/validation/test macro-F1 are near-identical for both ensembles (XGBoost
-0.804 / 0.805 / 0.813; RF 0.813 / 0.806 / 0.813) — no over-fitting. Spatial
-validation vs official polygons: containment 0.30, **enrichment 1.60×**,
-inside/outside High odds **1.85×** (model concentrates High-pressure in official
-flood zones while capturing a broader rainfall-driven footprint).
+The application source (`dashboard.py`, `main.py`, the pipeline modules) and the
+runtime artifacts (`real_flood_dataset.parquet`, `model_outputs_real/`,
+`data_cache/`) are included **in this folder**, so it is a self-contained,
+runnable, and deployable final-submission package.
 
 ---
 
-## Quick start
+## ▶️ How to install and run the app (step by step)
+
+**Prerequisites:** Python 3.11+ and Git, on Windows/macOS/Linux.
 
 ```bash
-python -m venv .venv && .venv\Scripts\activate      # Windows (PowerShell: .venv\Scripts\Activate.ps1)
+# 1. Clone and enter the repo (this final-submission project)
+git clone <your-repo-url>
+cd <repo-folder>
+
+# 2. Create and activate a virtual environment
+python -m venv .venv
+.venv\Scripts\activate            # Windows
+# source .venv/bin/activate       # macOS / Linux
+
+# 3. Install dependencies
 pip install -r requirements.txt
 
-python main.py all          # build -> train -> evaluate  (fetches real data, ~minutes)
-python main.py dashboard    # launch the Streamlit inspection app
+# 4. Build the dataset + train the models (fetches real, free, keyless data;
+#    cached in data_cache/ so re-runs are fast and offline). ~ a few minutes.
+python main.py all                # build -> train -> evaluate
+#    (skip step 4 if real_flood_dataset.parquet and model_outputs_real/ already exist)
+
+# 5. Launch the dashboard
+python main.py dashboard          # or: streamlit run dashboard.py
+#    open the printed URL, e.g. http://localhost:8501
 ```
 
-Individual stages: `python main.py build | polygons | train | evaluate | dashboard`.
-API responses are cached in `data_cache/`, so re-runs are fast and offline-friendly.
+**Run the tests / regenerate the screenshots** (from the repo root):
 
-## Project structure
+```bash
+python -m pytest tests/test_pipeline.py -v
+python tests/demo_data_values.py
+python tests/benchmark_performance.py
+python tests/make_dashboard_preview.py
+```
+
+---
+
+## 🗂️ Project files
 
 | File | Purpose |
 |---|---|
-| `main.py` | Pipeline orchestrator (CLI entry point) |
+| `main.py` | Pipeline orchestrator / CLI entry point |
 | `build_real_dataset.py` | Fetch real data, engineer features, build labels → `real_flood_dataset.parquet` |
-| `add_official_polygons.py` | Stand-alone official-polygon integration / refresh |
-| `train_real.py` | Train baselines + RF + XGBoost + HMM; temporal hold-out; SHAP |
-| `evaluate_spatial.py` | Spatial validation (enrichment, odds ratio) + flood-pressure risk map |
-| `dashboard.py` | Streamlit inspection dashboard (maps, per-cell inspector, metrics) |
+| `add_official_polygons.py` | Official MOE flood-polygon integration |
+| `train_real.py` | Train baselines + RF + XGBoost + HMM; train/val/test temporal split; SHAP |
+| `evaluate_spatial.py` | Spatial validation (enrichment, odds ratio) + risk map |
+| `dashboard.py` | **The deployed Streamlit app** |
 | `model_outputs_real/` | Trained models, figures, `results_summary.json` |
-| `Flood_Risk_HMM_Capstone_Proposal.docx/.pdf` | The written proposal |
+| `requirements.txt` | Runtime dependencies for the dashboard (slim, pinned) |
+| `requirements-training.txt` | Full pipeline dependencies (build / train / analysis) |
 
-## Data sources
+---
 
-All inputs are real and free; only OpenStreetMap requires a `User-Agent` header.
-Endpoints below are the ones actually called in `build_real_dataset.py` and
-`add_official_polygons.py` (verified live).
+## 🎥 5-minute demo video
+**Video link:*https://drive.google.com/drive/folders/1r40O1Zam6Q01XjnC6ho-FYh9wl8zY-SZ?usp=sharing* 
 
-| # | Feature(s) it provides | Source | API / endpoint | Access · licence |
-|---|---|---|---|---|
-| 1 | `rainfall_1d/3d/7d/14d_mm` (daily totals → accumulation features) | Open-Meteo — ERA5 reanalysis | `https://archive-api.open-meteo.com/v1/archive` | Free, keyless · ERA5/Copernicus |
-| 2 | `elevation_m`, derived `slope_deg` (terrain) | Open-Meteo — SRTM elevation | `https://api.open-meteo.com/v1/elevation` | Free, keyless · SRTM/NASA |
-| 3 | `distance_to_river_m`, `road_density_km_per_km2`, `building_density_count_per_km2` (rivers, roads, buildings) | OpenStreetMap — Overpass API | `https://overpass.kumi.systems/api/interpreter` (any Overpass mirror works; mirrors rate-limit and need a `User-Agent`) | Free · ODbL |
-| 4 | `flood_polygon_intersection` (+ spatial-validation reference) | Rwanda GeoPortal — Ministry of Environment | `https://geodata.rw/server/rest/services/basemap/Flood_Risk_Areas/FeatureServer/0` (query params must be URL-encoded) | Free · MOE |
+---
 
-> **Note on rainfall:** the proposal named Meteo Rwanda / CHIRPS; the implementation
-> uses **Open-Meteo ERA5 reanalysis** because Meteo Rwanda offered no open, keyless
-> access within the project window. ERA5 is real but reanalysis-grade (~9–31 km),
-> so validation against Meteo Rwanda gauge records is future work.
+## 🌐 Live deployment
+**Deployed URL:*https://capstone-final-appuct-bgmfwaouxcwdocou8j2p7z.streamlit.app/* 
 
-## Data & ethics note
+---
 
-A *flood-pressure state* is a **derived risk condition** (rainfall + terrain + exposure),
-**not a confirmed flood event**. The framework is a decision-support / risk-screening
-tool that complements — and does not replace — official early-warning systems.
-Official polygons: Rwanda GeoPortal (geodata.rw), source Ministry of Environment.
+## ✅ Results at a glance (2024 test hold-out)
 
-## License / attribution
+Temporal split: **train 2018–2022 · validation 2023 · test 2024**.
 
-Rainfall & elevation © Open-Meteo (ERA5, Copernicus; SRTM/NASA). Map data ©
-OpenStreetMap contributors (ODbL). Flood polygons © Rwanda GeoPortal / MOE.
+| Model | Macro-F1 | High-recall | Note |
+|---|---|---|---|
+| **XGBoost (+SHAP)** | **0.813** | 0.843 | best & deployed — meets F1≥0.75 & recall≥0.80 |
+| Random Forest | 0.813 | **0.849** | ties on F1, best High-recall |
+| Rainfall-threshold baseline | 0.626 | — | beaten by +0.19 F1 |
+| Static-polygon baseline | 0.324 | — | beaten by +0.49 F1 |
+
+Train/validation/test macro-F1 track closely (XGBoost 0.804 / 0.805 / 0.813;
+RF 0.813 / 0.806 / 0.813) — no over-fitting; the model generalises across years.
+Spatial validation vs official polygons: **enrichment 1.60×** (target ≥1.4 ✅),
+inside/outside High odds **1.85×** (target ≥1.5 ✅). Live query latency **p95 ≈
+9.6 ms** vs the 2 s budget ✅. Full breakdown in
+[`analysis/ANALYSIS.md`](analysis/ANALYSIS.md).
+
+---
+
+## 📜 Data & attribution
+
+Rainfall & elevation © Open-Meteo (ERA5/Copernicus; SRTM/NASA). Map data ©
+OpenStreetMap contributors (ODbL). Flood polygons © Rwanda GeoPortal / Ministry
+of Environment. All sources are free and keyless.
